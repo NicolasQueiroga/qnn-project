@@ -162,9 +162,12 @@ cython_debug/
 
 # data
 data_road/
+PennFudanPed/
 data/
+archive/
 
 # results
 results/
+outputs/
 
 # input
