@@ -41,6 +41,10 @@ parser.add_argument(
     type=int
 )
 parser.add_argument(
+    '--device',
+    default='cuda',
+)
+parser.add_argument(
     '--scheduler',
     action='store_true',
 )
@@ -54,7 +58,7 @@ if __name__ == '__main__':
     os.makedirs(out_dir, exist_ok=True)
     os.makedirs(out_dir_valid_preds, exist_ok=True)
 
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    device = torch.device(args.device)
     model = UNet(num_classes=len(ALL_CLASSES)).to(device)
     print(model)
     # Total parameters and trainable parameters.
