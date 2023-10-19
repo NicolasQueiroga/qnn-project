@@ -2,6 +2,30 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from qiskit import QuantumCircuit
+from qiskit.utils import algorithm_globals
+from qiskit.circuit import Parameter
+from qiskit.circuit.library import RealAmplitudes, ZZFeatureMap
+from qiskit_machine_learning.neural_networks import SamplerQNN, EstimatorQNN
+from qiskit_machine_learning.connectors import TorchConnector
+
+
+def create_qnn():
+    feature_map = ZZFeatureMap(2)
+    ansatz = RealAmplitudes(2, reps=1)
+    qc = QuantumCircuit(2)
+    qc.compose(feature_map, inplace=True)
+    qc.compose(ansatz, inplace=True)
+
+    qnn = EstimatorQNN(
+        circuit=qc,
+        input_params=feature_map.parameters,
+        weight_params=ansatz.parameters,
+        input_gradients=True,
+    )
+    return qnn
+
+
 def double_convolution(in_channels, out_channels):
     """
     In the original paper implementation, the convolution operations were
@@ -19,7 +43,7 @@ def double_convolution(in_channels, out_channels):
     return conv_op
 
 class UNet(nn.Module):
-    def __init__(self, num_classes):
+    def __init__(self, num_classes, qnn):
         super(UNet, self).__init__()
 
         self.max_pool2d = nn.MaxPool2d(kernel_size=2, stride=2)
@@ -59,12 +83,15 @@ class UNet(nn.Module):
             stride=2)
         self.up_convolution_4 = double_convolution(128, 64)
 
+        self.qnn = TorchConnector(qnn)
+        self.fc3 = nn.Linear(1, 1)
+
         # output => increase the `out_channels` as per the number of classes.
         self.out = nn.Conv2d(
             in_channels=64, 
             out_channels=num_classes, 
             kernel_size=1
-        ) 
+        )
 
     def forward(self, x):
         down_1 = self.down_convolution_1(x)
@@ -102,5 +129,6 @@ if __name__ == '__main__':
     total_trainable_params = sum(
         p.numel() for p in model.parameters() if p.requires_grad)
     print(f"{total_trainable_params:,} training parameters.")
-    outputs = model(input_image)
+    qnn = create_qnn()
+    outputs = model(input_image, qnn)
     print(outputs.shape)
