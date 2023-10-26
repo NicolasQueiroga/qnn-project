@@ -176,3 +176,9 @@ outputs/
 # docs
 .next
 node_modules
+
+# mac
+.DS_Store
+*/.DS_Store
+*/.DS_Store?
+*/._*
