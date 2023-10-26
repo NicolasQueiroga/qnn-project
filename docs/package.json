@@ -1,7 +1,7 @@
 {
-  "name": "nextra-docs-template",
+  "name": "hybrid-qnn-project",
   "version": "0.0.1",
-  "description": "Nextra docs template",
+  "description": "Hybrid QNN Project",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
