@@ -14,11 +14,7 @@ Click the button to clone this repository and deploy it on Vercel:
 
 ## Local Development
 
-Install [pnpm](https://pnpm.js.org) with `npm i -g pnpm`.
-
-Run `pnpm i` to install the dependencies.
-
-Then, run `pnpm dev` to start the development server and visit localhost:3000.
+Run `docker compose up` to start the development server and visit localhost:3000.
 
 ## License
 
