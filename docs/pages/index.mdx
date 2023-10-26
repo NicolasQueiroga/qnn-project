@@ -1,11 +1,29 @@
-# Introduction
+# Introdução
  
-Welcome to Nextra! This is a basic docs template. You can use it as a starting point for your own project :)
+Para iniciar o nosso projeto da matéria de Introdução à Computação Quânjtica, em primeiro lugar, é necessário apresentar o problema que foi selecionado.
+O problema selecionado trata da classificação de imagens de tumores localizados na parte do cérebro do paciente. Dessa forma, a base de dados pode ser acessada 
+no link abaixo:
 
-## What is Nextra?
+[Kaggle - Brain Tumor](https://www.kaggle.com/datasets/thomasdubail/brain-tumors-256x256)
 
-A **simple**, **powerful** and **flexible** site generation framework with everything you love from Next.js.
+O dataset acima fornece uma base de dados com diversas imagens de tumores que devem ser classificados corretamente. Para isso, utilizamos uma Rede Convolucional
+AlexNet. 
 
-## Documentation
+## O que é a AlexNet?
 
-The documentation is available at [https://nextra.site](https://nextra.site).
+A AlexNet é uma arquitetura de rede neural convolucional (CNN) que se tornou amplamente conhecida por seu desempenho impressionante na 
+competição ImageNet Large Scale Visual Recognition Challenge de 2012. A ImageNet é um conjunto de dados que contém milhões de imagens em diversas
+categorias, e a competição desafiou os participantes a desenvolver algoritmos capazes de reconhecer objetos e categorias nas imagens com alta precisão.
+
+## Quais são os gargalos?
+
+No entanto, as redes neurais convolucionais possuem um bottle-neck. Esse bottle-neck se trata de uma limitação no desempenho da rede. Em primeiro lugar, requisitos 
+computacionais elevados fazem com que as Redes convolucionais profundas requerem recursos computacionais significativos, como GPUs potentes, para 
+treinamento e inferência. Isso pode ser um gargalo em termos de custo e acessibilidade.
+
+Além disso, a quantidade massiva de dados de treinamento com o intuito de obter desempenho de ponta, geralmente exigindo conjuntos de dados de 
+treinamento massivos, o que pode ser difícil de obter em algumas aplicações.
+
+Ademais, a interpretabilidade limitada dessas redes, são frequentemente consideradas como "caixas-pretas" devido ao grande número de parâmetros. 
+Isso dificulta a interpretação de como a rede toma decisões, o que pode ser crítico em aplicações médicas ou de segurança, que se trata dos dados
+em questão.
