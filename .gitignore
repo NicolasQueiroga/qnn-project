@@ -172,4 +172,6 @@ train/
 results/
 outputs/
 
-# input
+# docs
+.next
+node_modules
