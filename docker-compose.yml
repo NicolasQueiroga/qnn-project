@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  qnn:
+    container_name: qnn
+    build: 
+      context: .
+      shm_size: '11gb'
+    command: >
+      /bin/bash
+    shm_size: '11gb'
+    network_mode: 'host'
+    privileged: true
+    environment:
+      - IBMQ_TOKEN=${IBMQ_TOKEN}
+    ports:
+      - "8008:8888"
+    volumes:
+      - ./code:/code
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
