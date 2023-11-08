@@ -16,7 +16,6 @@ def create_qnn(output_dim):
     qc.compose(feature_map, inplace=True)
     qc.compose(ansatz, inplace=True)
 
-    # REMEMBER TO SET input_gradients=True FOR ENABLING HYBRID GRADIENT BACKPROP
     qnn = EstimatorQNN(
         circuit=qc,
         input_params=feature_map.parameters,
@@ -26,7 +25,7 @@ def create_qnn(output_dim):
     return qnn
 
 class AlexNetQNN(nn.Module):
-    def __init__(self, output_dim):
+    def __init__(self, output_dim, is_qnn=True):
         super().__init__()
 
         self.features = nn.Sequential(
@@ -53,12 +52,20 @@ class AlexNetQNN(nn.Module):
             nn.Linear(4096, 4096),
             nn.ReLU(inplace=True),
             nn.Linear(4096, output_dim),
-            TorchConnector(create_qnn(output_dim)),
-            nn.Linear(4, output_dim),
         )
 
-    def forward(self, x):
+        self.is_qnn = is_qnn
+        self.qantum_features = nn.Sequential(
+            TorchConnector(create_qnn(output_dim)),
+            nn.Linear(1, 4),
+        )
+
+    def forward(self, x, ibmq_backend=None):
         x = self.features(x)
         h = x.view(x.shape[0], -1)
         x = self.classifier(h)
+        if self.is_qnn:
+            if ibmq_backend is not None:
+                self.qantum_features[0].backend = ibmq_backend
+            x = self.qantum_features(x)
         return x, h
