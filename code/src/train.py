@@ -16,7 +16,7 @@ from src.model_utils import get_model
 from src.utils import LRFinder, plot_lr_finder
 from src.engine import train, evaluate, epoch_time
 
-# python3 train.py --epochs 10 --batch_size 10 --data_dir input/Data --output_dir output/
+# python3 src/train.py --epochs 10 --batch_size 10 --data_dir input/Data --output_dir outputs/
 
 parser = argparse.ArgumentParser(description='Train Hybrid Quantum Convolutional Neural Networks')
 parser.add_argument('--epochs', type=int, help='epochs')
@@ -73,16 +73,16 @@ if __name__ == '__main__':
     model = model.to(device)
     criterion = criterion.to(device)
 
-    print('Finding learning rate...')
-    lr_finder = LRFinder(model, optimizer, criterion, args.output_dir, device)
-    lrs, losses = lr_finder.range_test(train_iterator, END_LR, NUM_ITER)
-
-    print('Plotting learning rate finder. Saving to output directory...')
-    plot_lr_finder(lrs, losses, args.output_dir, skip_start = 30, skip_end = 30)
 
     if args.lr <= 0:
+        print('Finding learning rate...')
+        lr_finder = LRFinder(model, optimizer, criterion, args.output_dir, device)
+        lrs, losses = lr_finder.range_test(train_iterator, END_LR, NUM_ITER)
+
+        print('Plotting learning rate finder. Saving to output directory...')
+        plot_lr_finder(lrs, losses, args.output_dir, skip_start = 30, skip_end = 30)
         print('Getting best learning rate...')
-        found_lr = lr_finder.get_best_lr()
+        found_lr = 1e-3
         print(f'Found learning rate: {found_lr}')
         optimizer = optim.Adam(model.parameters(), lr=found_lr)
     else:
