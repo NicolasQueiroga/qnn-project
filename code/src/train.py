@@ -13,7 +13,7 @@ from src.ibm_backend import IBMBackend
 from src.datasets import get_dataset, get_dataloaders
 from src.utils import plot_images
 from src.model_utils import get_model
-from src.utils import LRFinder, plot_lr_finder
+from src.utils import *
 from src.engine import train, evaluate, epoch_time
 
 # python3 src/train.py --epochs 10 --batch_size 10 --data_dir input/Data --output_dir outputs/
@@ -114,3 +114,22 @@ if __name__ == '__main__':
         print(f'Epoch: {epoch+1:02} | Epoch Time: {epoch_mins}m {epoch_secs}s')
         print(f'\tTrain Loss: {train_loss:.3f} | Train Acc: {train_acc*100:.2f}%')
         print(f'\t Val. Loss: {valid_loss:.3f} |  Val. Acc: {valid_acc*100:.2f}%')
+
+    model.load_state_dict(torch.load(os.path.join(args.output_dir, f'{args.model}.pt')))
+    test_loss, test_acc = evaluate(model, test_iterator, criterion, device)
+    print(f'Test Loss: {test_loss:.3f} | Test Acc: {test_acc*100:.2f}%')
+
+    images, labels, probs = get_predictions(model, test_iterator, device)
+
+    pred_labels = torch.argmax(probs, 1)
+    plot_confusion_matrix(labels, pred_labels, classes)
+
+    corrects = torch.eq(labels, pred_labels)
+    incorrect_examples = []
+    for image, label, prob, correct in zip(images, labels, probs, corrects):
+        if not correct:
+            incorrect_examples.append((image, label, prob))
+
+    incorrect_examples.sort(reverse=True, key=lambda x: torch.max(x[2], dim=0).values)
+    corrects = torch.eq(labels, pred_labels)
+    plot_most_incorrect(incorrect_examples, classes, args.output_dir)

@@ -1,5 +1,5 @@
 from src.utils import calculate_accuracy
-from tqdm.notebook import tqdm, trange
+from tqdm.notebook import tqdm
 import torch
 
 

@@ -1,6 +1,7 @@
 import os
 import shutil
 import copy
+import numpy as np
 
 import torch
 from torch.utils.data import Dataset
@@ -66,8 +67,8 @@ def train_transforms(img_size, means, stds):
                         transforms.RandomHorizontalFlip(0.5),
                         transforms.RandomCrop(img_size, padding = 10),
                         transforms.ToTensor(),
-                        transforms.Normalize(mean = means, 
-                                            std = stds)
+                        transforms.Normalize(mean = np.array(means), 
+                                            std = np.array(stds))
                     ])
     
 
@@ -76,8 +77,8 @@ def test_transforms(img_size, means, stds):
                         transforms.Resize(img_size),
                         transforms.CenterCrop(img_size),
                         transforms.ToTensor(),
-                        transforms.Normalize(mean = means, 
-                                            std = stds)
+                        transforms.Normalize(mean = np.array(means), 
+                                            std = np.array(stds))
                     ])
     
 
@@ -103,7 +104,7 @@ def get_dataset(images_dir, train_dir, test_dir, output_dir, img_size=256, train
                                             [n_train_examples, n_valid_examples])
     
     valid_data = copy.deepcopy(valid_data)
-    valid_data.dataset.transform = test_transforms
+    valid_data.dataset.transform = test_transform
     
     return train_data, valid_data, test_data
 
