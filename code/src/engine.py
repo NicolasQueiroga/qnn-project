@@ -9,7 +9,7 @@ def epoch_time(start_time, end_time):
     elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
     return elapsed_mins, elapsed_secs
 
-def train(model, iterator, optimizer, criterion, device):
+def train(model, iterator, optimizer, criterion, device, backend=None):
     epoch_loss = 0
     epoch_acc = 0
     model.train()
@@ -19,7 +19,7 @@ def train(model, iterator, optimizer, criterion, device):
         y = y.to(device)
 
         optimizer.zero_grad()
-        y_pred, _ = model(x)
+        y_pred, _ = model(x, backend=backend)
         loss = criterion(y_pred, y)
         acc = calculate_accuracy(y_pred, y)
 
@@ -32,7 +32,7 @@ def train(model, iterator, optimizer, criterion, device):
     return epoch_loss / len(iterator), epoch_acc / len(iterator)
 
 
-def evaluate(model, iterator, criterion, device):
+def evaluate(model, iterator, criterion, device, backend=None):
     epoch_loss = 0
     epoch_acc = 0
     model.eval()
@@ -42,7 +42,7 @@ def evaluate(model, iterator, criterion, device):
             x = x.to(device)
             y = y.to(device)
 
-            y_pred, _ = model(x)
+            y_pred, _ = model(x, backend=backend)
             loss = criterion(y_pred, y)
             acc = calculate_accuracy(y_pred, y)
 

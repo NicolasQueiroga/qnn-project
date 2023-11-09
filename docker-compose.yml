@@ -5,10 +5,8 @@ services:
     container_name: qnn
     build: 
       context: .
-      shm_size: '11gb'
-    command: >
-      /bin/bash
-    shm_size: '11gb'
+      shm_size: '12gb'
+    shm_size: '12gb'
     network_mode: 'host'
     privileged: true
     environment:
@@ -24,3 +22,6 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+        limits:
+          cpus: '12'
+          memory: '24g'

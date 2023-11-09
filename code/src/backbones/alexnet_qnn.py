@@ -60,12 +60,10 @@ class AlexNetQNN(nn.Module):
             nn.Linear(1, 4),
         )
 
-    def forward(self, x, ibmq_backend=None):
+    def forward(self, x, backend=None):
         x = self.features(x)
         h = x.view(x.shape[0], -1)
         x = self.classifier(h)
         if self.is_qnn:
-            if ibmq_backend is not None:
-                self.qantum_features[0].backend = ibmq_backend
             x = self.qantum_features(x)
         return x, h
