@@ -35,7 +35,7 @@ parser.add_argument("--qnn", type=bool, help="quantum neural network", default=F
 parser.add_argument("--lr", type=float, help="learning rate", default=-1)
 parser.add_argument("--seed", type=float, help="seed", default=42)
 parser.add_argument(
-    "--backend", type=str, help="backend", default="ibm_perth"
+    "--backend", type=str, help="backend", default="ibmq_qasm_simulator"
 )
 parser.add_argument("--device", type=str, help="device", default="cuda")
 
@@ -82,16 +82,17 @@ if __name__ == "__main__":
         print(f"Creating output directory: {args.output_dir}")
         os.makedirs(args.output_dir)
 
-    print("Plotting data sample. Saving to output directory...")
-    images, labels = train_iterator.__iter__().__next__()
     classes = os.listdir(os.path.join(args.data_dir, "../train"))
-    plot_images(images, labels, classes, args.output_dir)
+    if not os.path.exists(os.path.join(args.output_dir, "data_sample.png")):
+        print("Plotting data sample. Saving to output directory...")
+        images, labels = train_iterator.__iter__().__next__()
+        plot_images(images, labels, classes, args.output_dir)
 
     START_LR = 1e-7
     END_LR = 10
     NUM_ITER = 100
     device = torch.device(args.device)
-    model = get_model(args.model, len(classes), args.qnn)
+    model = get_model(args.model, len(classes), backend=backend, is_qnn=args.qnn)
     optimizer = optim.Adam(model.parameters(), lr=START_LR)
     criterion = nn.CrossEntropyLoss()
     model = model.to(device)
@@ -99,7 +100,7 @@ if __name__ == "__main__":
 
     if args.lr <= 0:
         print("Finding learning rate...")
-        lr_finder = LRFinder(model, optimizer, criterion, args.output_dir, device, ibm_backend=backend)
+        lr_finder = LRFinder(model, optimizer, criterion, args.output_dir, device)
         lrs, losses = lr_finder.range_test(train_iterator, END_LR, NUM_ITER)
 
         print("Plotting learning rate finder. Saving to output directory...")
@@ -126,10 +127,10 @@ if __name__ == "__main__":
         start_time = time.monotonic()
 
         train_loss, train_acc = train(
-            model, train_iterator, optimizer, criterion, device, backend=backend
+            model, train_iterator, optimizer, criterion, device
         )
         valid_loss, valid_acc = evaluate(
-            model, valid_iterator, criterion, device, backend=backend
+            model, valid_iterator, criterion, device
         )
 
         if valid_loss < best_valid_loss:

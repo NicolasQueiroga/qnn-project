@@ -9,9 +9,9 @@ def initialize_parameters(m):
         nn.init.xavier_normal_(m.weight.data, gain=nn.init.calculate_gain('relu'))
         nn.init.constant_(m.bias.data, 0)
 
-def get_model(model_name, output_dim, init_params=True):
+def get_model(model_name, output_dim, backend=None, is_qnn=True, init_params=True):
     if model_name == 'alexnet_qnn':
-        model = alexnet_qnn.AlexNetQNN(output_dim)
+        model = alexnet_qnn.AlexNetQNN(output_dim, backend=backend, is_qnn=is_qnn)
     else:
         raise NotImplementedError
 

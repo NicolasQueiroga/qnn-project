@@ -125,13 +125,12 @@ def plot_most_incorrect(incorrect, classes, output_dir, n_images=25, normalize=T
 
 
 class LRFinder:
-    def __init__(self, model, optimizer, criterion, output_dir, device, ibm_backend=None):
+    def __init__(self, model, optimizer, criterion, output_dir, device):
         self.optimizer = optimizer
         self.model = model
         self.criterion = criterion
         self.output_dir = output_dir
         self.device = device
-        self.ibm_backend = ibm_backend
         torch.save(model.state_dict(), os.path.join(output_dir, 'init_params.pt'))
 
     def range_test(self, iterator, end_lr = 10, num_iter = 100, smooth_f = 0.05, diverge_th = 5):
@@ -167,7 +166,7 @@ class LRFinder:
         x, y = iterator.get_batch()
         x = x.to(self.device)
         y = y.to(self.device)
-        y_pred, _ = self.model(x, self.ibm_backend)      
+        y_pred, _ = self.model(x)      
         loss = self.criterion(y_pred, y)
         loss.backward()
         self.optimizer.step()
