@@ -1,7 +1,7 @@
 from torch import nn
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import RealAmplitudes, ZZFeatureMap
-from qiskit_machine_learning.neural_networks import CircuitQNN
+from qiskit_machine_learning.neural_networks import CircuitQNN, SamplerQNN
 from qiskit_machine_learning.connectors import TorchConnector
 
 
@@ -14,6 +14,14 @@ def create_qnn(output_dim, backend):
     qc = QuantumCircuit(output_dim)
     qc.compose(feature_map, inplace=True)
     qc.compose(ansatz, inplace=True)
+
+    # qnn = SamplerQNN(
+    #     circuit=qc,
+    #     input_params=feature_map.parameters,
+    #     weight_params=ansatz.parameters,
+    #     interpret=parity,
+    #     output_shape=output_dim,
+    # )
 
     qnn = CircuitQNN(
         circuit=qc,
