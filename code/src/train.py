@@ -7,12 +7,13 @@ import os
 import sys
 from torch import nn, optim
 from tqdm.notebook import tqdm, trange
+from clearml import Task
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from src.ibm_backend import IBMBackend
 from src.datasets import get_dataloaders, get_datasets
 from src.utils import plot_images
-from src.model_utils import get_model
+from src.model_utils import get_model, EarlyStopping
 from src.utils import *
 from src.engine import train, evaluate, epoch_time
 
@@ -37,13 +38,20 @@ parser.add_argument("--seed", type=float, help="seed", default=42)
 parser.add_argument(
     "--backend", type=str, help="backend", default="ibmq_qasm_simulator"
 )
+
+parser.add_argument("--clearml", type=bool, help="clearml", default=False)
 parser.add_argument("--device", type=str, help="device", default="cuda")
 
 if __name__ == "__main__":
     args = parser.parse_args()
     print(args)
-    print(f'\nIs training a QNN: {args.qnn}\n')
 
+    if args.clearml:
+        print("Setting up ClearML...")
+        task = Task.init(project_name="Quantum Convolutional Neural Networks", task_name="Train")
+
+
+    print(f'\nIs training a QNN: {args.qnn}\n')
     backend = None
     if args.qnn:
         print("Loading IBM backend...")
@@ -67,6 +75,10 @@ if __name__ == "__main__":
         train_ratio=args.train_ratio,
         val_ratio=args.val_ratio,
     )
+    print(f"Train size: {len(train_data)}")
+    print(f"Test size: {len(test_data)}")
+    print(f"Valid size: {len(valid_data)}")
+    print("Dataset loaded.\n")
 
     print("Loading dataloaders...")
     train_iterator, test_iterator, valid_iterator = get_dataloaders(
@@ -77,6 +89,8 @@ if __name__ == "__main__":
         num_workers=args.num_workers,
         pin_memory=args.pin_memory,
     )
+    print("Dataloaders loaded.\n")
+
 
     if not os.path.exists(args.output_dir):
         print(f"Creating output directory: {args.output_dir}")
@@ -106,8 +120,7 @@ if __name__ == "__main__":
         print("Plotting learning rate finder. Saving to output directory...")
         plot_lr_finder(lrs, losses, args.output_dir, skip_start=30, skip_end=30)
         print("Getting best learning rate...")
-        found_lr = 1e-3
-        print(f"Found learning rate: {found_lr}")
+        found_lr = float(input("Enter learning rate: "))
         optimizer = optim.Adam(model.parameters(), lr=found_lr)
     else:
         print(f"Using learning rate: {args.lr}")
@@ -123,6 +136,7 @@ if __name__ == "__main__":
 
     print("Training...")
     best_valid_loss = float("inf")
+    early_stopping = EarlyStopping(tolerance=5, min_delta=10)
     for epoch in trange(args.epochs, desc="Epochs"):
         start_time = time.monotonic()
 
@@ -141,6 +155,11 @@ if __name__ == "__main__":
 
         end_time = time.monotonic()
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
+
+        early_stopping(train_loss, valid_loss)
+        if early_stopping.early_stop:
+            print(f"We are at epoch: {epoch+1:02}")
+            break
 
         print(f"Epoch: {epoch+1:02} | Epoch Time: {epoch_mins}m {epoch_secs}s")
         print(f"\tTrain Loss: {train_loss:.3f} | Train Acc: {train_acc*100:.2f}%")
