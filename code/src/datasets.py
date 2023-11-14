@@ -45,6 +45,7 @@ class CustomDataset(Dataset):
 def split_images(
     images_dir, train_dir, test_dir, val_dir, train_ratio=0.8, val_ratio=0.1
 ):
+    print("Splitting images...")
     if os.path.exists(train_dir):
         shutil.rmtree(train_dir)
     if os.path.exists(test_dir):
@@ -87,8 +88,11 @@ def split_images(
             image_dst = os.path.join(test_dir, c, image)
             shutil.copyfile(image_src, image_dst)
 
+    print("Images splitted.\n")
+
 
 def get_train_transforms(img_size, means, stds):
+    print("Getting train transforms...")
     return transforms.Compose(
         [
             transforms.Resize(img_size),
@@ -102,6 +106,7 @@ def get_train_transforms(img_size, means, stds):
 
 
 def get_test_transforms(img_size, means, stds):
+    print("Getting test transforms...")
     return transforms.Compose(
         [
             transforms.Resize(img_size),
@@ -113,6 +118,7 @@ def get_test_transforms(img_size, means, stds):
 
 
 def pretrained_info(train_dir):
+    print("Getting pretrained means and stds...")
     train_data = datasets.ImageFolder(root=train_dir, transform=transforms.ToTensor())
 
     means = torch.zeros(3)
@@ -159,6 +165,7 @@ def get_dataloaders(
     num_workers=4,
     pin_memory=True,
 ):
+    print("Getting dataloaders...")
     train_dataloader = data.DataLoader(
         train_dataset,
         batch_size=batch_size,
