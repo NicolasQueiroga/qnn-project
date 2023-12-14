@@ -7,7 +7,6 @@ import os
 import sys
 from torch import nn, optim
 from tqdm.notebook import tqdm, trange
-from clearml import Task
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from src.ibm_backend import IBMBackend
@@ -17,7 +16,7 @@ from src.model_utils import get_model, EarlyStopping
 from src.utils import *
 from src.engine import train, evaluate, epoch_time
 
-# python3 src/train.py --epochs 10 --batch_size 256 --data_dir input/Data --output_dir outputs/ --lr 0.001
+# /py/bin/python3 src/train.py --epochs 10 --batch_size 100 --data_dir input/Data --output_dir outputs/ --lr 0.001 --qnn True --backend ibmq_qasm_simulator
 
 parser = argparse.ArgumentParser(
     description="Train Hybrid Quantum Convolutional Neural Networks"
@@ -33,7 +32,7 @@ parser.add_argument("--pretrained", type=bool, help="pretrained", default=False)
 parser.add_argument("--train_ratio", type=float, help="train ratio", default=0.8)
 parser.add_argument("--val_ratio", type=float, help="val ratio", default=0.1)
 parser.add_argument("--qnn", type=bool, help="quantum neural network", default=False)
-parser.add_argument("--lr", type=float, help="learning rate", default=-1)
+parser.add_argument("--lr", type=float, help="learning rate", default=0.001)
 parser.add_argument("--seed", type=float, help="seed", default=42)
 parser.add_argument(
     "--backend", type=str, help="backend", default="ibmq_qasm_simulator"
@@ -45,11 +44,6 @@ parser.add_argument("--device", type=str, help="device", default="cuda")
 if __name__ == "__main__":
     args = parser.parse_args()
     print(args)
-
-    if args.clearml:
-        print("Setting up ClearML...")
-        task = Task.init(project_name="Quantum Convolutional Neural Networks", task_name="Train")
-
 
     print(f'\nIs training a QNN: {args.qnn}\n')
     backend = None
@@ -120,7 +114,7 @@ if __name__ == "__main__":
         print("Plotting learning rate finder. Saving to output directory...")
         plot_lr_finder(lrs, losses, args.output_dir, skip_start=30, skip_end=30)
         print("Getting best learning rate...")
-        found_lr = float(input("Enter learning rate: "))
+        found_lr = args.lr#float(input("Enter learning rate: "))
         optimizer = optim.Adam(model.parameters(), lr=found_lr)
     else:
         print(f"Using learning rate: {args.lr}")

@@ -5,9 +5,9 @@ services:
     container_name: qnn
     build: 
       context: .
-      shm_size: '12gb'
-    shm_size: '12gb'
-    network_mode: 'host'
+      shm_size: '8gb'
+    shm_size: '8gb'
+    network_mode: 'bridge'
     privileged: true
     environment:
       - IBMQ_TOKEN=${IBMQ_TOKEN}
@@ -22,6 +22,3 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-        limits:
-          cpus: '12'
-          memory: '24g'
