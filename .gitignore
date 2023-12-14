@@ -186,3 +186,5 @@ node_modules
 
 # model
 *.pt
+
+yarn.lock
