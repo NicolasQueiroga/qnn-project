@@ -5,11 +5,9 @@ services:
     container_name: qnn
     build: 
       context: .
-      shm_size: '11gb'
-    command: >
-      /bin/bash
-    shm_size: '11gb'
-    network_mode: 'host'
+      shm_size: '8gb'
+    shm_size: '8gb'
+    network_mode: 'bridge'
     privileged: true
     environment:
       - IBMQ_TOKEN=${IBMQ_TOKEN}

@@ -1,0 +1,13 @@
+# Conclusão e Considerações
+
+Relembrando o objetivo inicial do projeto, que era propor algoritmos quânticos para problemas difíceis de resolver com computação clássica, podemos dizer que o objetivo foi alcançado,
+com a ressalva de que por conta do elevado tempo de execução de uma única época de treinamento (12 minutos), não foi possível treinar o algoritmo na máquina quântica real.
+Conseguimos propor um algoritimo de redes neurais hibrido não trívial para a classificação de tumores cerebrais utilizando um circuito quântico de 4 qubits.
+
+Apesar dos resultados não ter sido tão bom, eles eram esperados, já que o campo de computação quântica aplicada a redes neurais ainda é muito novo e não existem muitos trabalhos na área, em 
+comparaçao com a computação clássica. Mesmo assim, conseguimos identificar alguns pontos que possam indicar um grande potencial para o futuro da computação quântica aplicada a redes neurais, como 
+por exemplo, os gráficos de Learning Rate em função da perda. Nele podemos ver que o algoritmo quântico consegue atingir uma perda menor que o algoritmo clássico, mesmo com um learning rate maior.
+
+Mas ainda assim, considerando um âmbito de produção, ainda não é possível justificar a migração de um algoritmo clássico para um quântico, já que o algoritmo quântico ainda é muito mais lento que o
+clássico. No caso deste projeto, utilizamos um modelo leve de redes neurais, e com poucos dados e poucas classes (se fosse treinar em 100 épocas, levaria em torno de 15 horas). Mas se fosse um modelo
+mais complexo, como a YoLo, que é um modelo de detecção de objetos, que utiliza redes neurais convolucionais, o tempo de treinamento seria absurdamente maior, e o algoritmo quântico não seria viável (atualmente).

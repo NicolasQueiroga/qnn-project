@@ -1,0 +1,16 @@
+# Resultados do treinamento em GPU
+
+Como é de se esperar de um modelo clássico e leve como a AlexNet, o treinamento foi rápido e não apresentou problemas. 
+A rede convergiu em 10 épocas, com um tempo de treinamento de 12 segundos por época. O resultado final foi uma acurácia de 0.80 no conjunto de treinamento e 0.81 no conjunto de validação.
+
+Abaixo podemos observar a matriz de confusão do modelo:
+
+![Confusion Matrix](/resultados/confusion_matrix_gpu.png)
+
+## Análise de Learning Rate
+
+Também foi construído um gráfico que nos mostra a perda (loss) em função do learning rate. O gráfico foi construído com base em 100 iterações, com valores de learning rate variando de 0.001 a 10.
+
+![Learning Rate](/resultados/lr_finder_gpu.png)
+
+Do gráfico podemos observar que o learning rate ideal para o modelo está entre 0.001 e 0.0001, pois é nessa região que a perda é menor.

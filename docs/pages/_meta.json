@@ -1,4 +1,8 @@
 {
   "index": "Introdução",
-  "another": "O circuito quântico"
+  "problema" : "O problema",
+  "dados": "Os dados",
+  "modelo": "O modelo",
+  "circuito": "O circuito quântico",
+  "resultados": "Resultados"
 }

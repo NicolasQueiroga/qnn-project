@@ -1,36 +1,48 @@
 from torch import nn
-import torch
-
 from qiskit import QuantumCircuit
-from qiskit.utils import algorithm_globals
-from qiskit.circuit import Parameter
 from qiskit.circuit.library import RealAmplitudes, ZZFeatureMap
-from qiskit_machine_learning.neural_networks import SamplerQNN, EstimatorQNN
+from qiskit_machine_learning.neural_networks import CircuitQNN, SamplerQNN
 from qiskit_machine_learning.connectors import TorchConnector
 
 
-def create_qnn(output_dim):
+def parity(x):
+    return "{:b}".format(x).count("1") % 2
+
+def create_qnn(output_dim, backend):
     feature_map = ZZFeatureMap(output_dim)
     ansatz = RealAmplitudes(output_dim, reps=1)
     qc = QuantumCircuit(output_dim)
     qc.compose(feature_map, inplace=True)
     qc.compose(ansatz, inplace=True)
 
-    qnn = EstimatorQNN(
+    # qnn = SamplerQNN(
+    #     circuit=qc,
+    #     input_params=feature_map.parameters,
+    #     weight_params=ansatz.parameters,
+    #     interpret=parity,
+    #     output_shape=output_dim,
+    # )
+
+    qnn = CircuitQNN(
         circuit=qc,
         input_params=feature_map.parameters,
         weight_params=ansatz.parameters,
-        input_gradients=True,
+        interpret=parity,
+        output_shape=output_dim,
+        quantum_instance=backend,
     )
+
     return qnn
 
 class AlexNetQNN(nn.Module):
-    def __init__(self, output_dim, is_qnn=True):
+    def __init__(self, output_dim, backend=None, is_qnn=True):
         super().__init__()
 
         self.features = nn.Sequential(
-            nn.Conv2d(3, 64, 3, 2, 1),  # in_channels, out_channels, kernel_size, stride, padding
-            nn.MaxPool2d(2),  # kernel_size
+            nn.Conv2d(
+                3, 64, 3, 2, 1
+            ),  # in_channels, out_channels, kernel_size, stride, padding
+            nn.MaxPool2d(2),
             nn.ReLU(inplace=True),
             nn.Conv2d(64, 192, 3, padding=1),
             nn.MaxPool2d(2),
@@ -41,7 +53,7 @@ class AlexNetQNN(nn.Module):
             nn.ReLU(inplace=True),
             nn.Conv2d(256, 256, 3, padding=1),
             nn.MaxPool2d(2),
-            nn.ReLU(inplace=True)
+            nn.ReLU(inplace=True),
         )
 
         self.classifier = nn.Sequential(
@@ -55,17 +67,12 @@ class AlexNetQNN(nn.Module):
         )
 
         self.is_qnn = is_qnn
-        self.qantum_features = nn.Sequential(
-            TorchConnector(create_qnn(output_dim)),
-            nn.Linear(1, 4),
-        )
+        self.hybrid = TorchConnector(create_qnn(output_dim, backend))
 
-    def forward(self, x, ibmq_backend=None):
+    def forward(self, x):
         x = self.features(x)
         h = x.view(x.shape[0], -1)
         x = self.classifier(h)
         if self.is_qnn:
-            if ibmq_backend is not None:
-                self.qantum_features[0].backend = ibmq_backend
-            x = self.qantum_features(x)
+            x = self.hybrid(x)
         return x, h

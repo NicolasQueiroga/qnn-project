@@ -8,7 +8,7 @@ WORKDIR /code
 
 
 RUN apt update && apt -y upgrade && \
-    apt install -y python3.10-venv && \
+    apt install -y python3.10-venv libgl1-mesa-glx && \
     python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
     /py/bin/pip install -r /requirements.txt

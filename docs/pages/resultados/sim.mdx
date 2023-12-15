@@ -1,0 +1,27 @@
+# Resultados do treinamento em Simulador Quântico
+
+No caso de treinar o modelo em simulador quântico, no caso foram testados o simulador `ibmq_qasm_simulator` e `simulator_mps`. Em ambos os casos, tivemos um resultado muito semelhante.
+
+Para ambos, a rede não chegou a convergir em apenas 10 épocas, com um tempo de treinamento de 12 minutos por época os testes acabam ficando inviáveis.
+O resultado final foi uma acurácia de 0.27 no conjunto de treinamento e 0.29 no conjunto de validação.
+
+Abaixo podemos observar as matrizes de confusão do modelo treinado no simulador `ibmq_qasm_simulator` e `simulator_mps` respectivamente:
+
+![Confusion Matrix ibmq_qasm_simulator](/resultados/confusion_matrix_ibmq_sim.png)
+
+---
+
+![Confusion Matrix confusion_matrix_sim_mps](/resultados/confusion_matrix_sim_mps.png)
+
+
+## Análise de Learning Rate
+
+Também foi construído um gráfico que nos mostra a perda (loss) em função do learning rate. O gráfico foi construído com base em 100 iterações, com valores de learning rate variando de 0.001 a 10.
+
+Para âmbos os simuladores, o gráfico ficou da seguinte forma:
+
+![Learning Rate lr_finder_ibmq_sim](/resultados/lr_finder_ibmq_sim.png)
+
+Do gráfico podemos observar que o learning rate ideal para o modelo está presente em uma região muito próxima de 0.001, onde a perda é mínima.
+Mas também observamos que para qualquer valor no intervalo de learning rate, a perda é mínima, entre valores de 1.372 e 1380, o que nos leva a pensar na possibilidade de que utilizando uma rede neural quântica em 
+consunto com uma rede neural convolucional classica, podemos obter resultados melhores (mesmo que o tempo de treinamento seja muito maior).
