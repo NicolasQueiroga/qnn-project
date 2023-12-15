@@ -7,19 +7,24 @@ modelos clássicos de Machine Learning, formando, assim, um modelo híbrido quâ
 
 Abaixo, é possível ver o modelo:
 
-```python filename="qnn.py" {3} copy
-def create_qnn(output_dim):
+```python
+def parity(x):
+    return "{:b}".format(x).count("1") % 2
+
+def create_qnn(output_dim, backend):
     feature_map = ZZFeatureMap(output_dim)
     ansatz = RealAmplitudes(output_dim, reps=1)
     qc = QuantumCircuit(output_dim)
     qc.compose(feature_map, inplace=True)
     qc.compose(ansatz, inplace=True)
 
-    qnn = EstimatorQNN(
+    qnn = CircuitQNN(
         circuit=qc,
         input_params=feature_map.parameters,
         weight_params=ansatz.parameters,
-        input_gradients=True,
+        interpret=parity,
+        output_shape=output_dim,
+        quantum_instance=backend,
     )
 
     return qnn
@@ -37,9 +42,9 @@ Isso pode ser vantajoso em tipos específicos de dados e tarefas;
 2 - **Ansatz** -> É outra camada de circuito quântico usada para criar um estado quântico que representa a saída do modelo. Variando os parâmetros no 
 ansatz, o modelo quântico pode aprender a representar padrões complexos nos dados. Esta parte é crucial para a expressividade do modelo quântico;
 
-3 - **EstimatorQNN** -> É um invólucro Qiskit Aqua que combina o mapa de recursos, o ansatz e outros componentes em uma rede neural quântica treinável. O parâmetro 
-**input_gradients** definido como True sugere que você deseja treinar os parâmetros do circuito quântico usando métodos de otimização baseados em 
-gradientes.
+3 - **CircuitQNN** -> Em resumo, o CircuitQNN é um componente que encapsula a lógica quântica em uma rede neural quântica mais ampla. Ele facilita 
+a integração de operações quânticas em tarefas de aprendizado de máquina, permitindo que os benefícios da computação quântica sejam explorados em 
+conjunto com técnicas clássicas de aprendizado profundo.
 
 ## Benefícios do Modelo
 
